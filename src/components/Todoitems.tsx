@@ -3,7 +3,7 @@ import tick from '../assets/tick.png';
 import not_tick from '../assets/not_tick.png';
 import delete_icon from '../assets/delete.png';
 
-interface TodoItemProps {
+type TodoItemProps ={
   text: string;
   id: number;
   isComplete: boolean;

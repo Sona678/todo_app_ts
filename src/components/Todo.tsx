@@ -6,10 +6,7 @@ import fetchTodo from '../API/fetchTodo';
 import createTodo from '../API/createTodo';
 
 const Todo = () => {
-  const [todoList, setTodoList] = useState<any>(() => {
-    const saved = localStorage.getItem("todos");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [todoList, setTodoList] = useState<any>([]);
 
   const inputRef = useRef<any>(null); // using <any> 
 
@@ -47,11 +44,16 @@ const Todo = () => {
       )
     );
   };
+  useEffect(()=>{
+    const Todo=async()=>{
+      const data: any = await fetchTodo(); 
+      setTodoList(data)
+    }
+    Todo()
+  },[])
+  
 
-  useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todoList));
-  }, [todoList]);
-
+ 
   return (
      <div className='bg-white place-self-center w-11/12 max-w-md flex flex-col p-7 min-h-[550px] rounded-2xl'>
       {/* title */}
@@ -78,16 +80,17 @@ const Todo = () => {
 
       {/* todo list */}
       <div className='flex flex-col gap-2'>
-        {todoList.map((item: any) => (
-          <Todoitems
-            key={item.id}
-            text={item.text}
-            id={item.id}
-            isComplete={item.isComplete}
-            deleteTodo={deleteTodo}
-            toggle={toggle}
-          />
-        ))}
+       {todoList.map((item: any) => (
+  <Todoitems
+    key={item.id}
+    id={item.id}
+    text={item.title}
+    isComplete={item.isComplete}
+    deleteTodo={deleteTodo}
+    toggle={toggle}
+  />
+))}
+
       </div>
     </div>
   );
