@@ -2,30 +2,30 @@ import React from 'react';
 import tick from '../assets/tick.png';
 import not_tick from '../assets/not_tick.png';
 import delete_icon from '../assets/delete.png';
+import type { TodoItem } from '../interface';
 
-type TodoItemProps ={
-  text: string;
-  id: number;
-  isComplete: boolean;
+export type TodoItemProps ={
+  
+  todo:TodoItem;
   deleteTodo: (id: number) => void;
   toggle: (id: number) => void;
 }
 
-const Todoitems: React.FC<TodoItemProps> = ({ text, id, isComplete, deleteTodo, toggle }) => {
+const Todoitems: React.FC<TodoItemProps> = ({ todo, deleteTodo, toggle }) => {
   return (
     <div className='flex items-center justify-between bg-gray-100 p-3 rounded-lg'>
       <div
-        onClick={() => toggle(id)}
+        onClick={() => toggle(todo.id)}
         className='flex items-center gap-3 cursor-pointer'
       >
-        <img src={isComplete ? tick : not_tick} alt="status" className='w-6' />
-        <p className={`text-slate-700 text-[17px] ${isComplete ? 'line-through' : ''}`}>
-          {text}
+        <img src={todo.completed ? tick : not_tick} alt="status" className='w-6' />
+        <p className={`text-slate-700 text-[17px] ${todo.completed ? 'line-through' : ''}`}>
+          {todo.title}
         </p>
       </div>
       <img
         src={delete_icon}
-        onClick={() => deleteTodo(id)}
+        onClick={() => deleteTodo(todo.id)}
         alt="delete"
         className='w-4 cursor-pointer'
       />

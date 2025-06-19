@@ -2,21 +2,25 @@
 import { useEffect, useRef, useState } from 'react';
 import todo_icon from '../assets/todo_icon.png';
 import Todoitems from './Todoitems';
-import fetchTodo from '../API/fetchTodo';  
+import fetchTodo,{usefetchTodo} from '../API/fetchTodo';   
 import createTodo from '../API/createTodo';
+import type {TodoItemProps}  from './Todoitems';
+import type { TodoItem } from '../interface';
+
 
 const Todo = () => {
-  const [todoList, setTodoList] = useState<any>([]);
+  const{data}=usefetchTodo();
+  const [todoList, setTodoList] = useState<TodoItem[]>(data || []);
 
-  const inputRef = useRef<any>(null); // using <any> 
+  const inputRef = useRef<HTMLInputElement>(null); // using <any> 
 
   const add = async (): Promise<void> => {
     const inputText = inputRef.current?.value?.trim();
 
     if (!inputText) {
-      const data: any = await fetchTodo(); // <any> 
+      const data: {title:string} = await fetchTodo(); 
       if (data) {
-        setTodoList((prev: any) => [
+        setTodoList((prev:TodoItem[]) => [
           ...prev,
           { id: Date.now(), text: data.title, isComplete: false }
         ]);
@@ -24,7 +28,7 @@ const Todo = () => {
     } else {
       const newTodo: any = await createTodo(inputText); // <any> for created todo
       if (newTodo) {
-        setTodoList((prev: any) => [
+        setTodoList((prev: TodoItem[]) => [
           ...prev,
           { id: newTodo.id || Date.now(), text: newTodo.title, isComplete: false }
         ]);
@@ -45,12 +49,15 @@ const Todo = () => {
     );
   };
   useEffect(()=>{
-    const Todo=async()=>{
-      const data: any = await fetchTodo(); 
-      setTodoList(data)
+    // const Todo=async()=>{
+    //   const data: any = await fetchTodo(); 
+    //   setTodoList(data)
+    // }
+    // Todo()
+    if (data){
+      setTodoList(data);
     }
-    Todo()
-  },[])
+  },[data]);
   
 
  
@@ -83,9 +90,7 @@ const Todo = () => {
        {todoList.map((item: any) => (
   <Todoitems
     key={item.id}
-    id={item.id}
-    text={item.title}
-    isComplete={item.isComplete}
+    todo={item}
     deleteTodo={deleteTodo}
     toggle={toggle}
   />

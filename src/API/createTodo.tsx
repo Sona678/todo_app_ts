@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const createTodo = async (title:any) => {
+const createTodo = async (title:string) => {
   try {
     const response = await axios.post('https://jsonplaceholder.typicode.com/posts', {
       title: title,
@@ -13,7 +13,7 @@ const createTodo = async (title:any) => {
     });
 
     return response.data; 
-  } catch (error:any) {
+  } catch (error:unknown) {
     console.error("POST request failed:", error);
     return null;
   }
