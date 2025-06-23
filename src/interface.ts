@@ -3,3 +3,9 @@ export type TodoItem ={
   id: number;
   completed: boolean;
 }
+
+export type UserInfo ={
+  id: number;
+  name: string;
+  email: string;
+}
