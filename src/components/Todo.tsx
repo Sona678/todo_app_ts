@@ -1,42 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import todo_icon from "../assets/todo_icon.png";
 import Todoitems from "./Todoitems";
-import { useFetchTodo } from "../services/todo";
+import { useFetchTodo, useCreateTodo } from "../services/todo";
 import type { ITodo } from "../interface";
+import { UrlLink } from "./UrlLink";
 
 const Todo = () => {
-  // const { data: todos, isLoading, isError } = useFetchTodo();
-  const { data } = useFetchTodo();
+  const { data, isLoading, } = useFetchTodo(1);
+
+  const { mutate: createTodo, data: newTodo, isPending } = useCreateTodo();
+
   const [todoList, setTodoList] = useState<ITodo[]>(data || []);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const add = async (): Promise<void> => {
+  const add = async () => {
     const inputText = inputRef.current?.value?.trim();
-
-    // if (!inputText) {
-    //   const data: ITodo = (await fetchTodo()) as ITodo;
-    //   if (data) {
-    //     setTodoList((prev) => [
-    //       ...prev,
-    //       { id: Date.now(), text: data.text, isComplete: false },
-    //     ]);
-    //   }
-    // } else {
-    //   const newTodo: ITodo = await createTodo(inputText);
-    //   if (newTodo) {
-    //     setTodoList((prev) => [
-    //       ...prev,
-    //       {
-    //         id: newTodo.id || Date.now(),
-    //         text: newTodo.text,
-    //         isComplete: false,
-    //       },
-    //     ]);
-    //     if (inputRef?.current) {
-    //       inputRef.current.value = "";
-    //     }
-    //   }
-    // }
+    if (!inputText) return;
+    createTodo(inputText || "Empty todo");
   };
 
   const deleteTodo = (id: number): void => {
@@ -46,13 +26,21 @@ const Todo = () => {
   const toggle = (id: number): void => {
     setTodoList((prev) =>
       prev.map((todo) =>
-        todo.id === id ? { ...todo, isComplete: !todo.isComplete } : todo
+        todo.id === id ? { ...todo, isComplete: !todo.completed } : todo
       )
     );
   };
 
   useEffect(() => {
-    /**using useQuery */
+    if (newTodo) {
+      setTodoList((prev) => [{ ...newTodo, id: todoList.length + 1 }, ...prev]);
+      if (inputRef?.current) {
+        inputRef.current.value = "";
+      }
+    }
+  }, [newTodo]);
+
+  useEffect(() => {
     if (data) {
       setTodoList(data);
     }
@@ -60,10 +48,13 @@ const Todo = () => {
 
   return (
     <div className="bg-white place-self-center w-11/12 max-w-md flex flex-col p-7 min-h-[550px] rounded-2xl">
+      <UrlLink />
       {/* title */}
       <div className="flex items-center mt-7 gap-2">
         <img className="w-8" src={todo_icon} alt="logo" />
         <h1 className="text-3xl font-semibold">To-Do List</h1>
+        {isLoading && <code className="text-teal-400">Fetching...</code>}
+        {isPending && <code className="text-teal-400">Saving...</code>}
       </div>
 
       {/* input box */}
@@ -81,7 +72,6 @@ const Todo = () => {
           Add
         </button>
       </div>
-
       {/* todo list */}
       <div className="flex flex-col gap-2">
         {todoList.map((item) => (
